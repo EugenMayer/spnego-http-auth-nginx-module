@@ -1033,23 +1033,13 @@ ngx_http_auth_spnego_handler(
          * but doesn't support GSSAPI. We could attempt to fall
          * back to basic here... */
         if (NGX_DECLINED == ret) {
-            if (alcf->allow_unauthorized) {
-                spnego_debug0("GSSAPI failed, but user allowed");
-                return (ctx->ret = NGX_OK);
-            } else {
-                spnego_debug0("GSSAPI failed");
-                return (ctx->ret = NGX_HTTP_FORBIDDEN);
-            }
+            spnego_debug0("GSSAPI failed");
+  	    return (ctx->ret = NGX_HTTP_FORBIDDEN);            
         }
 
-        if (!ngx_spnego_authorized_principal(r, &r->headers_in.user, alcf)) {
-            if (alcf->allow_unauthorized) {
-                spnego_debug0("User not authorized, but allowed");
-                return (ctx->ret = NGX_OK);
-            } else {
-                spnego_debug0("User not authorized");
-                return (ctx->ret = NGX_HTTP_FORBIDDEN);
-            }
+        if (!ngx_spnego_authorized_principal(r, &r->headers_in.user, alcf)) {           
+          spnego_debug0("User not authorized");
+          return (ctx->ret = NGX_HTTP_FORBIDDEN);
         }
 
         spnego_debug0("GSSAPI auth succeeded");
