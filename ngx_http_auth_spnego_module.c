@@ -1053,12 +1053,17 @@ ngx_http_auth_spnego_handler(
         }
 
         spnego_debug0("GSSAPI auth succeeded");
-    }
+    } 
 
     ngx_str_t *token_out_b64 = NULL;
     switch(ret) {
         case NGX_DECLINED: /* DECLINED, but not yet FORBIDDEN */
-            ctx->ret = NGX_HTTP_UNAUTHORIZED;
+	    if (alcf->allow_unauthorized) {
+              spnego_debug0("Authenticaction failed - user would be unauthorized - still allowing due to allow_unauthorized: on");
+              ctx->ret = NGX_OK;
+            } else {	    
+              ctx->ret = NGX_HTTP_UNAUTHORIZED;
+	    }
             break;
         case NGX_OK:
             ctx->ret = NGX_OK;
